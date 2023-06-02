@@ -1,5 +1,5 @@
 import { TimeUnit } from 'src/enums/timeUnit.enum';
-import { datesMatch } from 'src/lib/datesMatch';
+import { datesMatch } from 'src/domain/datesMatch';
 
 // Include the datesMatch function here or import it from another file
 
