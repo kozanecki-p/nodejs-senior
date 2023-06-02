@@ -1,4 +1,12 @@
-import { Body, Controller, Post, HttpCode, HttpStatus } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  HttpCode,
+  HttpStatus,
+  Param,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginInput } from './dto/auth.input';
 
@@ -16,5 +24,11 @@ export class AuthController {
   @Post('register')
   signUp(@Body() signInDto: LoginInput) {
     return this.authService.singUp(signInDto.email, signInDto.password);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Get('verify/:VERIFICATION_CODE')
+  verify(@Param('VERIFICATION_CODE') verificationCode: string) {
+    return this.authService.verifyAccount(verificationCode);
   }
 }

@@ -6,17 +6,19 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { AuthRepository } from './auth.repository';
 import { Customer } from '@prisma/client';
+import { AccountVerificationService } from 'src/notifications/accountVerification.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private authRepository: AuthRepository,
     private jwtService: JwtService,
+    private accountVerificationService: AccountVerificationService,
   ) {}
 
   async signIn(email: string, pass: string): Promise<any> {
     const customer = await this.authRepository.findOneByEmail(email);
-    if (customer?.password !== pass) {
+    if (customer?.password !== pass || !customer.verified) {
       throw new UnauthorizedException();
     }
 
@@ -60,6 +62,18 @@ export class AuthService {
       throw new ConflictException();
     }
 
-    console.log(newCustomer);
+    await this.accountVerificationService.sendVerificationEmail(newCustomer);
+  }
+
+  async verifyAccount(verificationCode: string) {
+    const customer = await this.authRepository.findOneByVerificationCode(
+      verificationCode,
+    );
+
+    if (!customer) {
+      throw new UnauthorizedException();
+    }
+
+    await this.authRepository.setOneAsVerified(customer.id);
   }
 }

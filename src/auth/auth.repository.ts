@@ -19,8 +19,26 @@ export class AuthRepository {
       data: {
         email,
         password,
+        verificationCode: new Date().toDateString(), // standin for testing
       },
     });
     return customer;
+  }
+
+  async findOneByVerificationCode(
+    verificationCode: string,
+  ): Promise<Customer | null> {
+    const customer = await this.prisma.customer.findFirst({
+      where: { verificationCode },
+    });
+
+    return customer ? customer : null;
+  }
+
+  async setOneAsVerified(id: string): Promise<void> {
+    await this.prisma.customer.update({
+      where: { id },
+      data: { verified: true, verificationCode: null },
+    });
   }
 }
