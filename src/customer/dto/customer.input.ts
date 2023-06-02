@@ -30,3 +30,5 @@ export class GetCustomerInput {
   @Field(() => WhereCustomerInput, { nullable: true })
   where: WhereCustomerInput;
 }
+
+

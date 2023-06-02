@@ -7,6 +7,7 @@ import { JwtService } from '@nestjs/jwt';
 import { AuthRepository } from './auth.repository';
 import { Customer } from '@prisma/client';
 import { AccountVerificationService } from 'src/notifications/accountVerification.service';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
@@ -14,6 +15,7 @@ export class AuthService {
     private authRepository: AuthRepository,
     private jwtService: JwtService,
     private accountVerificationService: AccountVerificationService,
+    private configService: ConfigService,
   ) {}
 
   async signIn(email: string, pass: string): Promise<any> {
@@ -37,11 +39,11 @@ export class AuthService {
 
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(regularTokenPayload, {
-        secret: 'token_secret',
+        secret: this.configService.get<string>('JWT_SECRET'),
         expiresIn: '1h',
       }),
       this.jwtService.signAsync(refreshTokenPayload, {
-        secret: 'refresh_token_secret',
+        secret: this.configService.get<string>('REFRESH_TOKEN_SECRET'),
         expiresIn: '1d',
       }),
     ]);
